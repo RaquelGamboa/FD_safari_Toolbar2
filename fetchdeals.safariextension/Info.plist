@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>DWAlliance LLC.</string>
+	<key>Builder Version</key>
+	<string>534.57.2</string>
+	<key>CFBundleDisplayName</key>
+	<string>Fetchdeals.com</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.fetchdeals.fetchdeals</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>Chrome</key>
+	<dict>
+		<key>Database Quota</key>
+		<real>1048576</real>
+		<key>Global Page</key>
+		<string>global.html</string>
+		<key>Menus</key>
+		<array>
+			<dict>
+				<key>Identifier</key>
+				<string>main_menu</string>
+				<key>Menu Items</key>
+				<array>
+					<dict>
+						<key>Command</key>
+						<string>top_deals</string>
+						<key>Identifier</key>
+						<string>top_deals</string>
+						<key>Title</key>
+						<string>Top Deals</string>
+					</dict>
+					<dict>
+						<key>Command</key>
+						<string>browse_stores</string>
+						<key>Identifier</key>
+						<string>browse_stores</string>
+						<key>Title</key>
+						<string>Browse Stores</string>
+					</dict>
+					<dict>
+						<key>Command</key>
+						<string>browse_categories</string>
+						<key>Identifier</key>
+						<string>browse_categories</string>
+						<key>Title</key>
+						<string>Browse Categories</string>
+					</dict>
+					<dict>
+						<key>Command</key>
+						<string>print_coupons</string>
+						<key>Identifier</key>
+						<string>print_coupons</string>
+						<key>Title</key>
+						<string>Print Coupons</string>
+					</dict>
+					<dict>
+						<key>Command</key>
+						<string>help</string>
+						<key>Identifier</key>
+						<string>help</string>
+						<key>Title</key>
+						<string>Help</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>Toolbar Items</key>
+		<array>
+			<dict>
+				<key>Identifier</key>
+				<string>main_button</string>
+				<key>Image</key>
+				<string>16_gray.png</string>
+				<key>Label</key>
+				<string>FetchDeals</string>
+				<key>Menu</key>
+				<string>main_menu</string>
+			</dict>
+		</array>
+	</dict>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict>
+			<key>Start</key>
+			<array>
+				<string>scripts/jquery-1.8.0.js</string>
+				<string>scripts/main.js</string>
+				<string>scripts/md5Function.js</string>
+			</array>
+		</dict>
+	</dict>
+	<key>Description</key>
+	<string>Get the best deals!</string>
+	<key>ExtensionInfoDictionaryVersion</key>
+	<string>1.0</string>
+	<key>Permissions</key>
+	<dict>
+		<key>Website Access</key>
+		<dict>
+			<key>Include Secure Pages</key>
+			<true/>
+			<key>Level</key>
+			<string>All</string>
+		</dict>
+	</dict>
+	<key>Website</key>
+	<string>http://www.fetchdeals.com</string>
+</dict>
+</plist>

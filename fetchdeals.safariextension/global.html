@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <script type="text/javascript" src="scripts/md5Function.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+/***********MENU HANDLER******************/
+safari.application.addEventListener("command", performCommand, false);
+function performCommand(event){
+var currentTab = safari.application.activeBrowserWindow.activeTab;
+	
+	switch (event.command){
+		case "top_deals": 
+			currentTab.url = "http://www.fetchdeals.com";
+			break;
+		case "browse_stores": 
+			currentTab.url = "http://www.fetchdeals.com/stores";
+			break;
+		case "browse_categories": 
+			currentTab.url = "http://www.fetchdeals.com/category";
+			break;
+		case "print_coupons": 
+			currentTab.url = "http://www.fetchdeals.com/coupon";
+			break;
+		case "help": 
+			currentTab.url = "http://www.fetchdeals.com/toolbarfaq";
+			break;
+	}
+}
+/*****************************/
+safari.application.activeBrowserWindow.addEventListener("beforeNavigate", getRedirections, false);
+
+function getRedirections(){
+	console.log("BEFORE NAVIGATE: "+safari.application.activeBrowserWindow.activeTab.url);
+}
+
+var merchantID;
+
+safari.application.activeBrowserWindow.addEventListener("navigate", tabActivated, false);
+
+function tabActivated(){
+	
+	safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("startProcess",{
+		'action':	'go'
+	});
+	var currentTab = safari.application.activeBrowserWindow.activeTab;
+	currentTab.addEventListener("message",extensionProcess,false);
+}
+
+function extensionProcess(event){
+	if(event.name=="GetMerchant"){
+		hostName = event.message.hostName;
+		console.log(hostName);
+		getMerchants( function(merchantsList){
+			hostNameMd5 =  calcMD5(hostName);
+			merchantFound = "NO";
+			for(var i=0;i<merchantsList.length;i++){
+				if (hostNameMd5.toString() == merchantsList[i][0].toString()){
+					console.log("Merchant is on list: "+merchantsList[i][1]+"---"+merchantsList[i][0]);
+					merchantID = merchantsList[i][1];
+					merchantFound = "YES";
+					break;
+				}//if in list
+			} //for
+			safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("GetMerchant",{
+				'action':	'GetMerchant',
+				'merchantFound': merchantFound,
+				'merchantID' : merchantID
+			});
+		
+		});
+	} 
+	if(event.name=="postData"){
+		postData(event.message.tbCookie, event.message.referralURL, event.message.URL, event.message.browserName);
+	}
+	if(event.name=="GetLinks"){
+		getLinks(event.message.hostName, event.message.tbCookie, function(linkData){
+			var clickURL=linkData[0][0].toString();
+			var NoAutoStatus =linkData[0][1].toString();
+			console.log ("Get Links"+clickURL+"--"+NoAutoStatus);
+			//check if no autoredirect banner was clicked
+			getBannerClick(merchantID, event.message.tbCookie, function(response){
+				safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("GetLinks",{
+					'action':	'GetLinks',
+					'clickURL': clickURL,
+					'NoAutoStatus':NoAutoStatus,
+					'bannerClickResponse' : response
+				});
+			});
+		});
+	
+	}
+
+}
+
+/* Log data*/
+function postData(tbCookie, referralURL, URL, browserName){
+    
+    var MemberUID = tbCookie;
+    var BrowserName=browserName;
+    var ReferralURL= referralURL;
+    
+    //console.log("Member="+MemberUID);
+    
+	var post_url = "http://raquel.dwalliance.com/log.php?";
+	post_url = post_url + "&Browser=" + BrowserName;
+    post_url = post_url + "&URL=" + URL;
+	post_url = post_url + "&ReferralURL=" + ReferralURL;
+	post_url = post_url + "&MemberUID=" + MemberUID;
+    
+    var xhr = new XMLHttpRequest();
+	xhr.open("GET", post_url, true);
+	xhr.onreadystatechange = function() {
+	  if (xhr.readyState == 4) {
+		if (xhr.status == 200) {
+			var data = xhr.responseText;
+			//callback(data);
+			console.log("POSTDATA Successful: " + data);
+		  } else {
+			console.log("POSTDATA Unsuccessful: " + data);
+			//callback(null);
+		  }
+	  }
+	}
+	xhr.send();
+    
+};
+
+/* Get the list of all merchants in MD5*/
+function getMerchants(callback){
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "http://raquel.dwalliance.com/fetchdeals/api_get_affiliates.php", true);
+	xhr.onreadystatechange = function() {
+	  if (xhr.readyState == 4) {
+		if (xhr.status == 200) {
+			var data = JSON.parse(xhr.responseText);
+			callback(data);
+		  } else {
+			callback(null);
+		  }
+	  }
+	}
+xhr.send();
+
+};
+
+/* Get redirect link of a specific merchant*/
+function getLinks(hostName, memberId, callback){
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "http://raquel.dwalliance.com/fetchdeals/api_get_offerslink.php?murl="+hostName+"&mid="+memberId, true);
+	xhr.onreadystatechange = function() {
+	  if (xhr.readyState == 4) {
+		if (xhr.status == 200) {
+			var data = JSON.parse(xhr.responseText);
+			callback(data);
+		  } else {
+			callback(null);
+		  }
+	  }
+	}
+	xhr.send();
+};
+
+/* Get data if the banner was clicked*/
+function getBannerClick(merchantId, memberId, callback){
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "http://raquel.dwalliance.com/fetchdeals/api_set_bannerclick.php?merid="+merchantId+"&mid="+memberId+"&from_addon=y", true);
+	xhr.onreadystatechange = function() {
+	  if (xhr.readyState == 4) {
+		if (xhr.status == 200) {
+			var data = xhr.responseText;
+			callback(data);
+		  } else {
+			callback(null);
+		  }
+	  }
+	}
+xhr.send();
+
+};
+
+</script>
+
+</body>
+</html>
